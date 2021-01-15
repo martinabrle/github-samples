@@ -122,10 +122,13 @@ jobs:
         run: env
 
       - name: Set at_least_one job_ran status
-        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+        run: echo "at_least_one_job_ran=true" >> $GITHUB_ENV
         
       - name: Check at_least_one job_ran status
         run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Display variables
+        run: env
 
       - name: Job failed
         if: ${{ failure() }}
@@ -150,5 +153,7 @@ jobs:
       - name: Check at_least_one job_ran status
         run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
 
+      - name: Display variables
+        run: env
         
   
