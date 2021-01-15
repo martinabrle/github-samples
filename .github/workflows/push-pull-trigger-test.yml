@@ -93,16 +93,16 @@ jobs:
     steps:
       - name: Wait the for first 3 workflows
         run: |
-          declare jobs_status_json=""
+          declare jobs_status_json
           
-          declare run_on_pull_request_status=""
-          declare run_on_pull_request_conclusion=""
+          declare run_on_pull_request_status
+          declare run_on_pull_request_conclusion
           
-          declare run_on_push_status=""
-          declare run_on_push_conclusion=""
+          declare run_on_push_status
+          declare run_on_push_conclusion
           
-          declare run_on_workflow_status=""
-          declare run_on_workflow_conclusion=""
+          declare run_on_workflow_status
+          declare run_on_workflow_conclusion
           
           jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
           
