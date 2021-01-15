@@ -17,7 +17,7 @@ env:
   at_least_one_job_ran: false
 
 jobs:
-  display_env_var_pull_request:
+  run_on_pull_request:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Confirm job ran
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
 
-  display_env_var_push:
+  run_on_push:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
