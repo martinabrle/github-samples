@@ -32,8 +32,14 @@ jobs:
       - name: Display variables
         run: env
 
-      - name: Confirm job ran
-        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+      - name: Set at_least_one job_ran status
+        run: echo "at_least_one_job_ran=true" >> $GITHUB_ENV
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Display variables
+        run: env
 
   run_on_push:
     runs-on: ubuntu-latest
@@ -45,8 +51,14 @@ jobs:
       - name: Display variables
         run: env
 
-      - name: Confirm job ran
-        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+      - name: Set at_least_one job_ran status
+        run: echo "at_least_one_job_ran=true" >> $GITHUB_ENV
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Display variables
+        run: env
 
   run_on_workflow:
     runs-on: ubuntu-latest
@@ -55,17 +67,20 @@ jobs:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
 
+      - name: Wait 60s
+        run: sleep 60s
+
       - name: Display variables
         run: env
 
-      - name: Wair 60s
-        run: sleep 60s
-
       - name: Set at_least_one job_ran status
-        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+        run: echo "at_least_one_job_ran=true" >> $GITHUB_ENV
         
       - name: Check at_least_one job_ran status
         run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Display variables
+        run: env
 
   wait_for_three_jobs:
     runs-on: ubuntu-latest
@@ -108,7 +123,16 @@ jobs:
                 fi
              fi
           done
-          
+
+      - name: Set at_least_one job_ran status
+        run: echo "at_least_one_job_ran=true" >> $GITHUB_ENV
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Display variables
+        run: env
+
       - name: Last step
         run: echo "finished"
 
