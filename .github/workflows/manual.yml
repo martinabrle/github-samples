@@ -9,7 +9,7 @@ env:
 
 jobs:
   display_env_var_pull_request:
-    if: github.event_name == 'pull_request'
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Display trigger type
