@@ -13,6 +13,7 @@ on:
       - 'irrelevantapis/words/**'
   
   workflow_dispatch:
+     inputs:
 
 env:
   at_least_one_job_ran: false
