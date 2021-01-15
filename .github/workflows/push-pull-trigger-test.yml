@@ -32,7 +32,7 @@ jobs:
 
   run_on_push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow'
     steps:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
