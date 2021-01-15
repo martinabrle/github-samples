@@ -4,10 +4,19 @@ on:
   workflow_dispatch:
     inputs:
 
+env:
+  at_least_one_job_ran: false
+
 jobs:
   display_env_var_pull_request:
     runs-on: ubuntu-latest
     steps:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
-    
+
+      - name: Display variables
+        run: env
+
+      - name: Confirm job ran
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
+
