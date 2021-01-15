@@ -1,6 +1,7 @@
 # demonstrates dependencies and parallel processing of jobs
 # uses #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
 # article from git communities
+# notice that at_least_one_job_ran variable will not wor between jobs as they all run on a different runner
 
 name: push pull trigger test
 
@@ -60,9 +61,11 @@ jobs:
       - name: Wair 60s
         run: sleep 60s
 
-      - name: Confirm job ran
+      - name: Set at_least_one job_ran status
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
-             echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
 
   wait_for_three_jobs:
     runs-on: ubuntu-latest
@@ -118,8 +121,11 @@ jobs:
       - name: Display variables
         run: env
 
-      - name: Confirm job ran
+      - name: Set at_least_one job_ran status
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
 
       - name: Job failed
         if: ${{ failure() }}
@@ -139,5 +145,10 @@ jobs:
     steps:
       - name: Display final status
         shell: bash
-        run: echo "The parallel branch of jobs finished - at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+        run: echo "The parallel branch of jobs finished"
+        
+      - name: Check at_least_one job_ran status
+        run: echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+
+        
   
