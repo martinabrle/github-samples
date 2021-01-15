@@ -53,6 +53,9 @@ jobs:
       - name: Display variables
         run: env
 
+      - name: Wair 60s
+        run: sleep 60s
+
       - name: Confirm job ran
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
 
@@ -88,10 +91,10 @@ jobs:
         shell: bash
         run: echo "The parallel branch of jobs finished - at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
   
-  wait_for_push_pull_workflow: #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
+  wait_for_three_jobs: #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
     runs-on: ubuntu-latest
     steps:
-      - name: Wait the for first 3 workflows
+      - name: Wait till 3 jobs finish
         run: |
           declare jobs_status_json
           
@@ -122,12 +125,13 @@ jobs:
                    run_on_push_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .conclusion')
                    run_on_workflow_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .conclusion')
                    jobs_finished=true
+                   echo "All 3 jobs either finished or were skipped"
+                   echo "run_on_pull_request_conclusion:$run_on_pull_request_conclusion"
+                   echo "run_on_push_conclusion:$run_on_push_conclusion"
+                   echo "run_on_workflow_conclusion:$run_on_workflow_conclusion"
                 fi
              fi
           done
-          echo "run_on_pull_request_conclusion:$run_on_pull_request_conclusion"
-          echo "run_on_push_conclusion:$run_on_push_conclusion"
-          echo "run_on_workflow_conclusion:$run_on_workflow_conclusion"
           
       - name: Last step
         run: echo "finished"
