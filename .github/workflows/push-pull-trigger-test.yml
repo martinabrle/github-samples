@@ -93,14 +93,9 @@ jobs:
     steps:
       - name: Wait the for first 3 workflows
         run: |
-          $response=$(curl --request GET \
-            --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' \
-            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'content-type: application/json')
-          echo $response
+          declare jobs_status_json=""
+          jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
           
-          echo "::set-output name=status::$status"
-          echo "::set-output name=conclusion::$conclusion"
-          
+          echo $jobs_status_json
       - name: Last step
         run: echo "finished"
