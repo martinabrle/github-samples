@@ -1,4 +1,4 @@
-name: Manual workflow
+name: push pull trigger test
 
 on:
   workflow_dispatch:
@@ -58,8 +58,9 @@ jobs:
               "body": "Job failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
               }'
               
-  run_if_any:
+  run_after_parallel:
     runs-on: ubuntu-latest
+    needs: [run_parallel]
     steps:
       - name: Display final status
-        run: echo "At least one of the jobs succeeded"
+        run: echo "The parallel branch of jobs finished"
