@@ -1,17 +1,6 @@
 name: push pull trigger test
 
 on:
-  pull_request:
-    branches: [ master ]
-    paths:
-      - 'irrelevantapis/words/**'
-  
-  push:
-    branches:
-    - master
-    paths:
-      - 'irrelevantapis/words/**'
-  
   workflow_dispatch:
      inputs:
 
