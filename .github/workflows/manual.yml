@@ -23,6 +23,7 @@ jobs:
 
   display_env_var_push:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     steps:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
