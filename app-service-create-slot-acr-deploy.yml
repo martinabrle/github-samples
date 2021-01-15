@@ -1,0 +1,50 @@
+name: app service create slot acr deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  scriptname: app-service-create-slot-acr-deploy
+  acr-name: irrelevantwords-maabrle-acr.azurecr.io
+  app-name: irrelevantwords-maabrle
+  docker-working-directory : 'irrelevant-apis/words'
+  image-name: "ORGANISATION_NAME/${{ env.app-name }}"
+
+jobs:
+  deploy_staging:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Create staging slot
+      uses: azure/CLI@v1
+      with:
+         inlineScript: |
+            az webapp deployment slot create \
+              -g ${{ env.resource-group }} \
+              -n ${{ env.app-name }} \
+              --slot staging \
+              --configuration-source ${{ env.app-name }}
+    
+    - name: WebApp deploy
+      uses: azure/webapps-deploy@v2
+      with:
+         app-name: ${{ env.app-name }}
+         slot-name: staging
+         images: ${{ env.acr-name }}/${{ env.image-name }}:latest
+      
+    - name: Process errors
+      if: ${{ failure() }}
+      run: |
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/issues \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "title": "${{ env.script-name }} has failed: ${{ github.run_id }}",
+              "body": "${{ env.script-name }} has failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
+              }'

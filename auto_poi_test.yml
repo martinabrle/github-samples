@@ -1,0 +1,50 @@
+# This is a basic .net build and test workflow that is manually triggered
+
+name: Automatic Test of POI API
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'apis/poi/**'
+
+env:
+  scriptname: automatic-poi-test
+  acrname: openhackdz41qgg3acr.azurecr.io
+  appname: openhackdz41qgg3poi
+  resourcegroup: openhackdz41qgg3rg
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "test"
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: 'apis/poi/'
+    - name: Build
+      run: dotnet build --no-restore
+      working-directory: 'apis/poi/'
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      working-directory: 'apis/poi/'
+    - name: Process errors
+      if: ${{ failure() }}
+      run: |
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/issues \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "title": "${{ env.scriptname }} has failed: ${{ github.run_id }}",
+              "body": "${{ env.scriptname }} has failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
+              }'

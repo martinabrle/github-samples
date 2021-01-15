@@ -1,0 +1,41 @@
+name: app service swap slots
+
+on:
+  workflow_dispatch:
+
+env:
+  script-name: app-service-swap-slots
+  app-name: irrelevantwords-maabrle
+  resource-group: irrelevantwords-maabrle-rg
+
+jobs:
+  swap_slots:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Swap slots
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az webapp deployment slot swap \
+            -g ${{ env.resource-group }} \
+            -n ${{ env.app-name }} \
+            --slot staging \
+            --target-slot production
+    
+    - name: Process errors
+      if: ${{ failure() }}
+      run: |
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/issues \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "title": "${{ env.script-name }} has failed: ${{ github.run_id }}",
+              "body": "${{ env.script-name }} has failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
+              }'
