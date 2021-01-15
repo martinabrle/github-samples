@@ -94,7 +94,6 @@ jobs:
       - name: Wait the for first 3 workflows
         shell: bash
         run: |
-          sleep 120s
           response=""
           status=""
           conclusion=""
