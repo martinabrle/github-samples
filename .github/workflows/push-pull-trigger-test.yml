@@ -62,6 +62,7 @@ jobs:
 
       - name: Confirm job ran
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+             echo "at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
 
   wait_for_three_jobs:
     runs-on: ubuntu-latest
