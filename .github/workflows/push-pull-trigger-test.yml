@@ -1,0 +1,83 @@
+name: push pull trigger test
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'irrelevantapis/words/**'
+  
+  push:
+    branches:
+    - master
+    paths:
+      - 'irrelevantapis/words/**'
+  
+  workflow_dispatch:
+
+env:
+  at_least_one_job_ran: false
+
+jobs:
+  display_env_var_pull_request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Display trigger type
+      - run: echo "{{ $github.event_name }}"
+
+      - name: Display variables
+      - run: env
+
+      - name: Confirm job ran
+      - run: |
+          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
+      
+  display_env_var_push:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+
+    steps:
+      - name: Display trigger type
+      - run: echo "{{ $github.event_name }}"
+
+      - name: Display variables
+      - run: env
+
+      - name: Confirm job ran
+      - run: |
+          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
+      
+  run_parallel:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Display trigger type in parallel
+      - run: echo "{{ $github.event_name }}"
+
+      - name: Display variables
+      - run: env
+
+      - name: Confirm job ran
+      - run: |
+          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
+      
+      - name: Job failed
+        if: ${{ failure() }}
+        run: |
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/issues \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "title": "Job failed: ${{ github.run_id }}",
+              "body": "Job failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
+              }'
+
+  run_if_any:
+      runs-on: ubuntu-latest
+      if: ${{ env.at_least_one_job_ran }}
+
+      steps:
+      - name: Display trigger type in parallel
+      - run: echo "At least one of the jobs finished successfully"
+      
