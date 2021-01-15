@@ -104,19 +104,24 @@ jobs:
           declare run_on_workflow_status
           declare run_on_workflow_conclusion
           
-          jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
-          
-          run_on_pull_request_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
-          run_on_pull_request_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .conclusion')
-          
-          run_on_push_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .status')
-          run_on_push_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .conclusion')
-          
-          run_on_workflow_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .status')
-          run_on_workflow_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .conclusion')
-          
+          declare jobs_finished=false
+          while(jobs_finished -ne true)
+          do
+             jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
+             
+             run_on_pull_request_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
+             run_on_pull_request_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .conclusion')
+             
+             run_on_push_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .status')
+             run_on_push_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .conclusion')
+             
+             run_on_workflow_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .status')
+             run_on_workflow_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .conclusion')
+             
+             jobs_finished=true
+          done
           echo "run_on_pull_request_status:$run_on_pull_request_status"
-          echo "run_on_pull_request_conclusion:run_on_pull_request_conclusion"
+          echo "run_on_pull_request_conclusion:$run_on_pull_request_conclusion"
           
           echo "run_on_push_status:$run_on_push_status"
           echo "run_on_push_conclusion:$run_on_push_conclusion"
