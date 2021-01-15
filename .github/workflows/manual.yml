@@ -10,4 +10,4 @@ jobs:
 
     steps:
     - name: Send greeting
-      run: echo "${{ $github.event_name }}"
+      run: echo "{{$github.event_name }}"
