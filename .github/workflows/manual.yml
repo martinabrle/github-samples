@@ -23,7 +23,6 @@ jobs:
 
   display_env_var_push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
@@ -62,3 +61,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Display final status
+        run: echo "At least one of the jobs succeeded"
