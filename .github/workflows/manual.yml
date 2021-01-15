@@ -1,8 +1,17 @@
 name: push pull trigger test
 
 on:
+  push:
+    branches: main
+    paths:
+      - 'irrelevant-apis/words/**'
+  
+  pull_request:
+    branches: main
+    paths:
+      - 'irrelevant-apis/words/**'
+  
   workflow_dispatch:
-    inputs:
 
 env:
   at_least_one_job_ran: false
@@ -63,4 +72,4 @@ jobs:
     needs: [run_parallel]
     steps:
       - name: Display final status
-        run: echo "The parallel branch of jobs finished"
+        run: echo "The parallel branch of jobs finished - at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
