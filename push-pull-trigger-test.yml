@@ -1,16 +1,19 @@
+# demonstrates dependencies and parallel processing of jobs
+# uses #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
+# article from git communities
+
 name: push pull trigger test
 
 on:
-  pull_request:
-    branches: [ master ]
-    paths:
-      - 'irrelevantapis/words/**'
-  
   push:
-    branches:
-    - master
+    branches: main
     paths:
-      - 'irrelevantapis/words/**'
+      - 'irrelevant-apis/words/**'
+  
+  pull_request:
+    branches: main
+    paths:
+      - 'irrelevant-apis/words/**'
   
   workflow_dispatch:
 
@@ -18,49 +21,105 @@ env:
   at_least_one_job_ran: false
 
 jobs:
-  display_env_var_pull_request:
+  run_on_pull_request:
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
     steps:
       - name: Display trigger type
-      - run: echo "{{ $github.event_name }}"
+        run: echo $GITHUB_EVENT_NAME
 
       - name: Display variables
-      - run: env
+        run: env
 
       - name: Confirm job ran
-      - run: |
-          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
-      
-  display_env_var_push:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
 
+  run_on_push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     steps:
       - name: Display trigger type
-      - run: echo "{{ $github.event_name }}"
+        run: echo $GITHUB_EVENT_NAME
 
       - name: Display variables
-      - run: env
+        run: env
 
       - name: Confirm job ran
-      - run: |
-          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
-      
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+
+  run_on_workflow:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Display trigger type
+        run: echo $GITHUB_EVENT_NAME
+
+      - name: Display variables
+        run: env
+
+      - name: Wair 60s
+        run: sleep 60s
+
+      - name: Confirm job ran
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+
+  wait_for_three_jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait till 3 jobs finish
+        run: |
+          declare jobs_status_json
+          
+          declare run_on_pull_request_status
+          declare run_on_pull_request_conclusion
+          
+          declare run_on_push_status
+          declare run_on_push_conclusion
+          
+          declare run_on_workflow_status
+          declare run_on_workflow_conclusion
+          
+          declare jobs_finished=false
+          while [ $jobs_finished != true ]
+          do
+             sleep 10s
+             jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
+             
+             run_on_pull_request_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
+             run_on_push_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .status')
+             run_on_workflow_status=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .status')
+             
+             if [[ ! -z "$run_on_pull_request_status" ]] && [[ ! -z "$run_on_push_status" ]] && [[ ! -z "$run_on_workflow_status" ]]
+             then
+                if [[ "$run_on_pull_request_status" == "completed" ]] && [[ "$run_on_push_status"  == "completed" ]] && [[ "$run_on_workflow_status"  == "completed" ]]
+                then
+                   run_on_pull_request_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .conclusion')
+                   run_on_push_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .conclusion')
+                   run_on_workflow_conclusion=$(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .conclusion')
+                   jobs_finished=true
+                   echo "All 3 jobs either finished or were skipped"
+                   echo "run_on_pull_request_conclusion:$run_on_pull_request_conclusion"
+                   echo "run_on_push_conclusion:$run_on_push_conclusion"
+                   echo "run_on_workflow_conclusion:$run_on_workflow_conclusion"
+                fi
+             fi
+          done
+          
+      - name: Last step
+        run: echo "finished"
+
   run_parallel:
-      runs-on: ubuntu-latest
-      steps:
-      - name: Display trigger type in parallel
-      - run: echo "{{ $github.event_name }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display trigger type
+        run: echo $GITHUB_EVENT_NAME
 
       - name: Display variables
-      - run: env
+        run: env
 
       - name: Confirm job ran
-      - run: |
-          echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV"
-      
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+
       - name: Job failed
         if: ${{ failure() }}
         run: |
@@ -72,12 +131,12 @@ jobs:
               "title": "Job failed: ${{ github.run_id }}",
               "body": "Job failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
               }'
-
-  run_if_any:
-      runs-on: ubuntu-latest
-      if: ${{ env.at_least_one_job_ran }}
-
-      steps:
-      - name: Display trigger type in parallel
-      - run: echo "At least one of the jobs finished successfully"
-      
+              
+  run_after_parallel:
+    runs-on: ubuntu-latest
+    needs: [run_parallel]
+    steps:
+      - name: Display final status
+        shell: bash
+        run: echo "The parallel branch of jobs finished - at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+  
