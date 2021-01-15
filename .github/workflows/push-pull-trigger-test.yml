@@ -95,26 +95,20 @@ jobs:
         shell: bash
         run: |
           sleep 120s
+          response=""
           status=""
           conclusion=""
           while [ "$status" != "completed" ]
           do
-            response=$(curl --request GET \
+            $response=$(curl --request GET \
             --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' \
             --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
             --header 'Accept: application/vnd.github.v3+json')
-                       
-            status=$(echo $response | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
-            echo $status
-            if [[ $status == completed ]]; then
-              conclusion=$(echo $response | jq -r '.jobs[] | select(.name=="job1") | .conclusion')
-              echo $conclusion
-            else
-              sleep 10s
-              # The frequency of the API request is too high may cause error "API rate limit exceeded".
-              # Using a sleep to reduce the frequency of loop.
-            fi
-            exit 1
+            
+            $status = "completed"
+            
+            echo $response
+            
           done
           
           echo "::set-output name=status::$status"
