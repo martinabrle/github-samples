@@ -9,8 +9,8 @@ env:
 
 jobs:
   display_env_var_pull_request:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Display trigger type
         run: echo $GITHUB_EVENT_NAME
@@ -22,7 +22,6 @@ jobs:
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
 
   display_env_var_push:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
       - name: Display trigger type
@@ -59,7 +58,6 @@ jobs:
               }'
               
   run_if_any:
-    if: ${{ env.at_least_one_job_ran }}
     runs-on: ubuntu-latest
     steps:
       - name: Display final status
