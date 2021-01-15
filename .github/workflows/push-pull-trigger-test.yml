@@ -43,6 +43,19 @@ jobs:
       - name: Confirm job ran
         run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
 
+  run_on_workflow:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Display trigger type
+        run: echo $GITHUB_EVENT_NAME
+
+      - name: Display variables
+        run: env
+
+      - name: Confirm job ran
+        run: echo "{at_least_one_job_ran}={true}" >> $GITHUB_ENV
+
   run_parallel:
     runs-on: ubuntu-latest
     steps:
@@ -72,4 +85,40 @@ jobs:
     needs: [run_parallel]
     steps:
       - name: Display final status
+        shell: bash
         run: echo "The parallel branch of jobs finished - at_least_one_job_ran:${{ env.at_least_one_job_ran }}."
+  
+  wait_for_push_pull_workflow: #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait the for first 3 workflows
+        shell: bash
+        run: |
+          sleep 120s
+          status=""
+          conclusion=""
+          while [ "$status" != "completed" ]
+          do
+            response=$(curl --request GET \
+            --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' \
+            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'Accept: application/vnd.github.v3+json')
+                       
+            status=$(echo $response | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
+            echo $status
+            if [[ $status == completed ]]; then
+              conclusion=$(echo $response | jq -r '.jobs[] | select(.name=="job1") | .conclusion')
+              echo $conclusion
+            else
+              sleep 10s
+              # The frequency of the API request is too high may cause error "API rate limit exceeded".
+              # Using a sleep to reduce the frequency of loop.
+            fi
+            exit 1
+          done
+          
+          echo "::set-output name=status::$status"
+          echo "::set-output name=conclusion::$conclusion"
+          
+      - name: Last step
+        run: echo "finished"
