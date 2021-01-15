@@ -94,8 +94,35 @@ jobs:
       - name: Wait the for first 3 workflows
         run: |
           declare jobs_status_json=""
+          
+          declare run_on_pull_request_status=""
+          declare run_on_pull_request_conclusion=""
+          
+          declare run_on_push_status=""
+          declare run_on_push_conclusion=""
+          
+          declare run_on_workflow_status=""
+          declare run_on_workflow_conclusion=""
+          
           jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
           
-          echo $jobs_status_json
+          run_on_pull_request_status     = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .status')
+          run_on_pull_request_conclusion = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_pull_request") | .conclusion')
+          
+          run_on_push_status             = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .status')
+          run_on_push_conclusion         = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_push") | .conclusion')
+          
+          run_on_workflow_status         = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .status')
+          run_on_workflow_conclusion     = $(echo $jobs_status_json | jq -r '.jobs[] | select(.name=="run_on_workflow") | .conclusion')
+          
+          echo "run_on_pull_request_status:     $run_on_pull_request_status"
+          echo "run_on_pull_request_conclusion: $run_on_pull_request_conclusion"
+          
+          echo "run_on_push_status:             $run_on_push_status"
+          echo "run_on_push_conclusion:         $run_on_push_conclusion"
+          
+          echo "run_on_pull_request_status:     $run_on_pull_request_status"
+          echo "run_on_workflow_conclusion:     $run_on_workflow_conclusion"
+          
       - name: Last step
         run: echo "finished"
