@@ -108,7 +108,7 @@ jobs:
           declare run_on_workflow_conclusion
           
           declare jobs_finished=false
-          while [ $jobs_finished -ne true ]
+          while [ $jobs_finished != true ]
           do
              sleep 10s
              jobs_status_json=$(curl --request GET --url 'https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs' --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' --header 'content-type: application/json')
