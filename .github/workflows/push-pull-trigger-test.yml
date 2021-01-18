@@ -1,7 +1,6 @@
 # demonstrates dependencies and parallel processing of jobs
-# uses #https://github.community/t/can-i-check-a-job-status-from-a-step-thats-in-another-job/124746/2
-# article from git communities
-# notice that at_least_one_job_ran variable will not wor between jobs as they all run on a different runner
+# notice that at_least_one_job_ran variable will not behave as expected - as jobs they all run on a different runner
+# and a different runner = another container
 
 name: push pull trigger test
 
