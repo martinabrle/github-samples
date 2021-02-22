@@ -32,6 +32,7 @@ namespace Words
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "words", Version = "v1" });
             });
+            services.AddHealthChecks().AddCheck<Services.LivenessHealthCheck>("liveness_health_check");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +54,7 @@ namespace Words
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
