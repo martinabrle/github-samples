@@ -41,9 +41,10 @@ namespace Words
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "words v1"));
             }
+            //allowing to run swagger even from PROD
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "words v1"));
 
             app.UseHttpsRedirection();
 
@@ -55,6 +56,7 @@ namespace Words
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthChecks("/ready");
             });
         }
     }
