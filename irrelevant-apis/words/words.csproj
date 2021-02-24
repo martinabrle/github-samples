@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <DefaultItemExcludes>
+    $(DefaultItemExcludes);tests/**;
+  </DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

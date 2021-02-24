@@ -36,7 +36,7 @@ namespace Words.Controllers
         }
 
         [HttpGet("{term}")] 
-        public ActionResult<IEnumerable<Word>> Get(string term)
+        public ActionResult<Word> Get(string term)
         {
             return Ok(WeirdWords.First(e => e.Term.Equals(term,StringComparison.OrdinalIgnoreCase)));
         }
@@ -68,7 +68,11 @@ namespace Words.Controllers
         [HttpDelete]
         public ActionResult Delete(string term)
         {
-            return Accepted();
+            var wordToDelete = WeirdWords.Where(e => e.Term.Equals(term, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (wordToDelete != null)
+                WeirdWords.Remove(wordToDelete);
+
+            return Ok();
         }
 
     }
