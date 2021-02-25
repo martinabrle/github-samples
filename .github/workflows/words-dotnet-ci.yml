@@ -1,0 +1,52 @@
+# Implements a simple CI workflow for words-dotnet API,
+# which runs for all pull requests to the main branch,
+# resulting in a zip archive with the web-api
+
+name: push pull trigger test
+
+on:
+  pull_request:
+    branches: main
+    paths:
+      - 'irrelevant-apis/words-dotnet/**'
+  
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Restore dependencies
+      run: dotnet restore --force
+      working-directory: 'irrelevant-apis/words-dotnet'
+    - name: Build
+      run: dotnet build --configuration Release --no-restore --nologo
+      working-directory: 'irrelevant-apis/words-dotnet'
+    - name: Test
+      run: dotnet test --configuration Release --no-build --verbosity normal --nologo
+      working-directory: 'irrelevant-apis/words-dotnet/'
+    - name: Publish
+      run: dotnet publish ./words.csproj --configuration Release -o ./web-build --no-build --no-self-contained --nologo
+      working-directory: 'irrelevant-apis/words-dotnet/'
+      #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
+    - name: Create Zip Archive
+      run: zip words-dotnet.zip *
+      working-directory: 'irrelevant-apis/words-dotnet/words-dotnet'
+
+    - name: Process errors
+      if: ${{ failure() }}
+      run: |
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/issues \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "title": "${{ env.scriptname }} has failed: ${{ github.run_id }}",
+              "body": "${{ env.scriptname }} has failed: **${{ github.workflow }}**. \n\n Failure in run: _${{ github.run_id }}_."
+              }'
+  

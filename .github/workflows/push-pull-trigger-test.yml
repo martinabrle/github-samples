@@ -8,12 +8,12 @@ on:
   push:
     branches: main
     paths:
-      - 'irrelevant-apis/words/**'
+      - 'irrelevant-apis/words-dotnet/**'
   
   pull_request:
     branches: main
     paths:
-      - 'irrelevant-apis/words/**'
+      - 'irrelevant-apis/words-dotnet/**'
   
   workflow_dispatch:
 
