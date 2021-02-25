@@ -33,14 +33,20 @@ jobs:
     - name: Publish
       run: dotnet publish ./words.csproj --configuration Release -o ./web-build --no-build --no-self-contained --nologo
       working-directory: 'irrelevant-apis/words-dotnet/'
-      #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
+      #TODO:create a file name from the version number
     - name: Create Zip Archive
       run: zip -q words-dotnet.zip *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
-    - name: Az Login
-      run: ls
-      working-directory: 'irrelevant-apis/words-dotnet/web-build'
-
+      #upload file name to the artefacts 
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Deploy to AppService
+      uses: azure/webapps-deploy@v2
+      with:
+         app-name: ${{ secrets.AZURE_APP_NAME }}
+         package: irrelevant-apis/words-dotnet/web-build/words-dotnet.zip
     - name: Process errors
       if: ${{ failure() }}
       run: |
