@@ -35,9 +35,9 @@ jobs:
       working-directory: 'irrelevant-apis/words-dotnet/'
       #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
     - name: Create Zip Archive
-      run: zip words-dotnet.zip *
+      run: zip -q words-dotnet.zip *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
-    - name: List files
+    - name: Az Login
       run: ls
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
 
