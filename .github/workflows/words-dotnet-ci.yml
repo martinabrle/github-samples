@@ -36,7 +36,7 @@ jobs:
       #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
     - name: Create Zip Archive
       run: ls
-      working-directory: 'irrelevant-apis/words-dotnet/words-dotnet'
+      working-directory: 'irrelevant-apis/words-dotnet/web-build'
 
     - name: Process errors
       if: ${{ failure() }}
