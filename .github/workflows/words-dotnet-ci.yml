@@ -35,7 +35,7 @@ jobs:
       working-directory: 'irrelevant-apis/words-dotnet/'
       #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
     - name: Create Zip Archive
-      run: ls
+      run: ls /bin
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
 
     - name: Process errors
