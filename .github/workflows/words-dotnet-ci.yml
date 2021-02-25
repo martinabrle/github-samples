@@ -2,7 +2,7 @@
 # which runs for all pull requests to the main branch,
 # resulting in a zip archive with the web-api
 
-name: push pull trigger test
+name: words-dotnet-ci-cd
 
 on:
   pull_request:
