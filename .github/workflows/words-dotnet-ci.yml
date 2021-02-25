@@ -25,7 +25,7 @@ jobs:
       run: dotnet restore --force
       working-directory: 'irrelevant-apis/words-dotnet'
     - name: Build
-      run: dotnet build --configuration Release --no-restore --nologo
+      run: dotnet build --configuration Release --no-restore
       working-directory: 'irrelevant-apis/words-dotnet'
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal --nologo
