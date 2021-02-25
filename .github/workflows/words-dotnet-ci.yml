@@ -36,7 +36,9 @@ jobs:
       #if the next command fails, add apt-get install zip  --assume-yes or sudo apt-get install zip  --assume-yes
     - name: Create Zip Archive
       run: |
-           ls /
+           pwd
+           ls
+           7z
       working-directory: 'irrelevant-apis/words-dotnet/words-dotnet'
 
     - name: Process errors
