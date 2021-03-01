@@ -33,11 +33,35 @@ jobs:
     - name: Publish
       run: dotnet publish ./words.csproj --configuration Release -o ./web-build --no-build --no-self-contained --nologo
       working-directory: 'irrelevant-apis/words-dotnet/'
-      #TODO:create a file name from the version number
+      #TODO:create a file name from the version number + github variable + (if manual than -manual-timestamp)
     - name: Create Zip Archive
       run: zip -q words-dotnet.zip *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
       #upload file name to the artefacts 
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./SampleX86.ZIP
+          asset_name: SampleX86.ZIP
+          asset_content_type: application/zi      
     - name: Azure Login
       uses: azure/login@v1
       with:
