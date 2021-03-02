@@ -15,12 +15,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PACKAGE_FILE_NAME: false    
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.103
+    - name: Generate packagee name
+      #this one is not ideal. Using xmlint or a similar unix command would be preferred....
+      #or even using a custom github action from the marketplace. But.... I just want
+      #my pipeline to be as fast as possible, because that's it - it's just a single person's
+      #little pipeline
+      #TODO:check if the package already exists with this version and if yes, add a timestamp
+      #     or... perhaps check if manually triggered and add "manual"
+      run: |
+         grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
+         cat ./version.tmp | tr -d '[:space:]' > version.tmp
+         PACKAGE_VERSION=$(tr -d '\0' < ./version.tmp)
+         if [[ ! -z "$PACKAGE_VERSION" ]] || PACKAGE_VERSION == ""
+         then
+            echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
+            exit 1
+         fi
+         PACKAGE_FILE_NAME="words-dotnet-($PACKAGE_VERSION).zip"
+         echo $PACKAGE_FILE_NAME
+         echo "PACKAGE_FILE_NAME=$PACKAGE_FILE_NAME" >> $GITHUB_ENV
+      working-directory: 'irrelevant-apis/words-dotnet/'        
     - name: Restore dependencies
       run: dotnet restore --force
       working-directory: 'irrelevant-apis/words-dotnet'
@@ -35,7 +57,7 @@ jobs:
       working-directory: 'irrelevant-apis/words-dotnet/'
       #TODO:create a file name from the version number + github variable + (if manual than -manual-timestamp)
     - name: Create Zip Archive
-      run: zip -q words-dotnet.zip *
+      run: zip -q ${{ env.PACKAGE_FILE_NAME }} *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
     - name: Create Release
       id: create_release
@@ -44,11 +66,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          release_name: ${{ env.PACKAGE_FILE_NAME }}
+          body: ${{ env.PACKAGE_FILE_NAME }}
           draft: false
           prerelease: false
       #upload file name to the artefacts 
@@ -59,9 +78,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./SampleX86.ZIP
-          asset_name: SampleX86.ZIP
-          asset_content_type: application/zi      
+          asset_path: ./${{ env.PACKAGE_FILE_NAME }}
+          asset_name: ${{ env.PACKAGE_FILE_NAME }}
+          asset_content_type: application/zip
     - name: Azure Login
       uses: azure/login@v1
       with:
@@ -70,7 +89,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
          app-name: ${{ secrets.AZURE_APP_NAME }}
-         package: irrelevant-apis/words-dotnet/web-build/words-dotnet.zip
+         package: irrelevant-apis/words-dotnet/web-build/${{ env.PACKAGE_FILE_NAME }}
     - name: Process errors
       if: ${{ failure() }}
       run: |
