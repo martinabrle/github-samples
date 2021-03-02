@@ -33,13 +33,10 @@ jobs:
       run: |
          declare PACKAGE_VERSION
          grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
-         cat ./version.tmp
-         ls /bin
-         tr
          cat ./version.tmp | tr -d '[:space:]' > version.tmp
-         cat ./version.tmp
-         PACKAGE_VERSION=$(tr -d '\0' < ./version.tmp)
-         if [[ ! -z "$PACKAGE_VERSION" ]] || PACKAGE_VERSION == ""
+         cat ./version.tmp | tr -d '\0' > version.tmp
+         PACKAGE_VERSION=$(< ./version.tmp)
+         if [[ ! -z "$PACKAGE_VERSION" ]]
          then
             echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
             exit 1
