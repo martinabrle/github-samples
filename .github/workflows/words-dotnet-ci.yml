@@ -33,18 +33,20 @@ jobs:
       run: |
          declare PACKAGE_VERSION
          grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
-         cat ./version.tmp | tr -d '[:space:]' > version.tmp
-         cat ./version.tmp | tr -d '\0' > version.tmp
+         cat ./version.tmp | tr -d '[:space:]' > ./version.tmp
+         cat ./version.tmp | tr -d '\0' > ./version.tmp
+         cat ./version.tmp
          PACKAGE_VERSION=$(< ./version.tmp)
+         echo "version ${PACKAGE_VERSION}
          if [[ ! -z "$PACKAGE_VERSION" ]]
          then
             echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
             exit 1
          fi
          echo $PACKAGE_VERSION
-         PACKAGE_FILE_NAME="words-dotnet-{$PACKAGE_VERSION}.zip"
+         PACKAGE_FILE_NAME="words-dotnet-${$PACKAGE_VERSION}.zip"
          echo $PACKAGE_FILE_NAME
-         echo "PACKAGE_FILE_NAME=$PACKAGE_FILE_NAME" >> $GITHUB_ENV
+         echo "PACKAGE_FILE_NAME={$PACKAGE_FILE_NAME}" >> $GITHUB_ENV
       working-directory: 'irrelevant-apis/words-dotnet/'        
     - name: Restore dependencies
       run: dotnet restore --force
