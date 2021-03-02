@@ -98,7 +98,7 @@ jobs:
          app-name: ${{ secrets.AZURE_APP_SERVICE_WORDS_DOTNET_APP_NAME }}
          package: irrelevant-apis/words-dotnet/web-build/${{ env.PACKAGE_FILE_NAME }}
     - name: Process errors
-      if: ${{ failure() }}
+      if: ${{ failure() }}      
       run: |
           curl --request POST \
             --url https://api.github.com/repos/${{ github.repository }}/issues \
