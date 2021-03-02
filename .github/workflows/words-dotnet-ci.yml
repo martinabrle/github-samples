@@ -67,7 +67,7 @@ jobs:
       uses: actions/create-release@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}          
+          PACKAGE_VERSION: ${ env.PACKAGE_VERSION }
       with:
           tag_name: ${PACKAGE_VERSION}
           release_name: ${PACKAGE_VERSION}
@@ -79,7 +79,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_FILE_NAME: ${{ env.PACKAGE_FILE_NAME }}
+          PACKAGE_FILE_NAME: ${ env.PACKAGE_FILE_NAME }
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: "./irrelevant-apis/words-dotnet/web-build/${PACKAGE_FILE_NAME}"
