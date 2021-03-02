@@ -33,7 +33,7 @@ jobs:
       run: |
          declare PACKAGE_VERSION
          grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
-         PACKAGE_VERSION="$(tr -d '[:space:]' < ./version.tmp)
+         PACKAGE_VERSION="$(tr -d '[:space:]' < ./version.tmp)"
          echo $PACKAGE_VERSION
          #cat ./version.tmp
          #cat ./version.tmp | tr -d '[:space:]' > ./version.tmp
