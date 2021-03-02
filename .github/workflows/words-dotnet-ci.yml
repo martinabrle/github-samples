@@ -47,6 +47,7 @@ jobs:
          PACKAGE_FILE_NAME="words-dotnet-${$PACKAGE_VERSION}.zip"
          echo $PACKAGE_FILE_NAME
          echo "PACKAGE_FILE_NAME={$PACKAGE_FILE_NAME}" >> $GITHUB_ENV
+      shell: bash
       working-directory: 'irrelevant-apis/words-dotnet/'        
     - name: Restore dependencies
       run: dotnet restore --force
