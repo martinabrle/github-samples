@@ -71,9 +71,9 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-          tag_name: $PACKAGE_VERSION
-          release_name: $PACKAGE_VERSION
-          body: "Words API Version ${PACKAGE_VERSION}"
+          tag_name: ${{ env.PACKAGE_VERSION }}
+          release_name: ${{ env.PACKAGE_VERSION }}
+          body: "Words API Version ${{ env.PACKAGE_VERSION }}"
           draft: false
           prerelease: true
     - name: Upload Release Asset
@@ -82,11 +82,11 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
-          filename: "irrelevant-apis/words-dotnet/web-build/${PACKAGE_FILE_NAME}"
+          filename: "irrelevant-apis/words-dotnet/web-build/${{ env.PACKAGE_FILE_NAME }}"
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "irrelevant-apis/words-dotnet/web-build/${PACKAGE_FILE_NAME}"
-          asset_name: "${PACKAGE_FILE_NAME}"
+          asset_path: "irrelevant-apis/words-dotnet/web-build/${{ env.PACKAGE_FILE_NAME }}"
+          asset_name: ${{ env.PACKAGE_FILE_NAME }}
           asset_content_type: application/zip
     - name: Azure Login
       uses: azure/login@v1
