@@ -33,13 +33,12 @@ jobs:
       run: |
          declare PACKAGE_VERSION
          grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
-         PACKAGE_VERSION="$(tr -d '[:space:,\0,\n,\r,\t]' < ./version.tmp)"
+         PACKAGE_VERSION="$(tr -d '[:space:],\0,\n,\r,\t' < ./version.tmp)"
          if [[ -z "$PACKAGE_VERSION" ]]
          then
             echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
             exit 1
          fi
-         echo $PACKAGE_VERSION
          PACKAGE_FILE_NAME="words-dotnet-${$PACKAGE_VERSION}.zip"
          echo $PACKAGE_FILE_NAME
          echo "PACKAGE_FILE_NAME={$PACKAGE_FILE_NAME}" >> $GITHUB_ENV
