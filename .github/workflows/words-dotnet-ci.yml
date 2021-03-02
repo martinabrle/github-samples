@@ -39,7 +39,7 @@ jobs:
             echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
             exit 1
          fi
-         PACKAGE_FILE_NAME="words-dotnet-${$PACKAGE_VERSION}.zip"
+         PACKAGE_FILE_NAME="words-dotnet-${PACKAGE_VERSION}.zip"
          echo $PACKAGE_FILE_NAME
          echo "PACKAGE_FILE_NAME={$PACKAGE_FILE_NAME}" >> $GITHUB_ENV
       shell: bash
