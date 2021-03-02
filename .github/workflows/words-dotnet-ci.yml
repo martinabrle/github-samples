@@ -60,11 +60,10 @@ jobs:
       working-directory: 'irrelevant-apis/words-dotnet/'
       #TODO:create a file name from the version number + github variable + (if manual than -manual-timestamp)
     - name: Create Zip Archive
-      env:
-         PACKAGE_FILE_NAME: $env.PACKAGE_FILE_NAME
       run: |
-         echo "$PACKAGE_FILE_NAME"
-         zip -q "$PACKAGE_FILE_NAME" *
+         echo "${PACKAGE_FILE_NAME}"
+         zip -q $PACKAGE_FILE_NAME *
+         ls
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
     - name: Create Release
       id: create_release
