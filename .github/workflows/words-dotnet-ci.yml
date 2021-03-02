@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PACKAGE_FILE_NAME: false    
+      PACKAGE_FILE_NAME: "words.zip"    
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -31,6 +31,7 @@ jobs:
       #TODO:check if the package already exists with this version and if yes, add a timestamp
       #     or... perhaps check if manually triggered and add "manual"
       run: |
+         declare PACKAGE_VERSION
          grep -Poz '<Version>\s*\K[\s\S]*(?=</Version>)' ./words.csproj > ./version.tmp
          cat ./version.tmp | tr -d '[:space:]' > version.tmp
          PACKAGE_VERSION=$(tr -d '\0' < ./version.tmp)
@@ -39,7 +40,8 @@ jobs:
             echo "::error file={words.csproj}::Unable to extract version from words.csproj. Check that Version tag is in there and does not have any spaces in it."
             exit 1
          fi
-         PACKAGE_FILE_NAME="words-dotnet-($PACKAGE_VERSION).zip"
+         echo $PACKAGE_VERSION
+         PACKAGE_FILE_NAME="words-dotnet-{$PACKAGE_VERSION}.zip"
          echo $PACKAGE_FILE_NAME
          echo "PACKAGE_FILE_NAME=$PACKAGE_FILE_NAME" >> $GITHUB_ENV
       working-directory: 'irrelevant-apis/words-dotnet/'        
