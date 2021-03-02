@@ -42,8 +42,8 @@ jobs:
             exit 1
          fi
          PACKAGE_FILE_NAME="words-dotnet-${PACKAGE_VERSION}.zip"
-         echo "PACKAGE_VERSION={$PACKAGE_VERSION}" >> $GITHUB_ENV
-         echo "PACKAGE_FILE_NAME={$PACKAGE_FILE_NAME}" >> $GITHUB_ENV
+         echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+         echo "PACKAGE_FILE_NAME=$PACKAGE_FILE_NAME" >> $GITHUB_ENV
       shell: bash
       working-directory: 'irrelevant-apis/words-dotnet/'        
     - name: Restore dependencies
@@ -60,11 +60,9 @@ jobs:
       working-directory: 'irrelevant-apis/words-dotnet/'
       #TODO:create a file name from the version number + github variable + (if manual than -manual-timestamp)
     - name: Create Zip Archive
-      env:
-         PACKAGE_FILE_NAME: ${ env.PACKAGE_FILE_NAME }
       run: |
-         echo ${PACKAGE_FILE_NAME}"
-         zip -q "${PACKAGE_FILE_NAME}" *
+         echo "${env.PACKAGE_FILE_NAME}"
+         zip -q "${env.PACKAGE_FILE_NAME}" *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
     - name: Create Release
       id: create_release
