@@ -27,10 +27,8 @@ jobs:
     - name: Generate package name
       #this one is not ideal. Using xmlint or a similar unix command would be preferred....
       #or even using a custom github action from the marketplace. But.... I just want
-      #my pipeline to be as fast as possible, because that's it - it's just a single person's
-      #little pipeline
-      #TODO:check if the package already exists with this version and if yes, add a timestamp
-      #     or... perhaps check if manually triggered and add "manual"
+      #my ci/cd pipeline to be as fast as possible, because that's it - it's just a single person's
+      #little ci/cd pipeline:-)
       run: |
          declare PACKAGE_VERSION
          declare PACKAGE_FILE_NAME
@@ -59,12 +57,9 @@ jobs:
     - name: Publish
       run: dotnet publish ./words.csproj --configuration Release -o ./web-build --no-build --no-self-contained --nologo
       working-directory: 'irrelevant-apis/words-dotnet/'
-      #TODO:create a file name from the version number + github variable + (if manual than -manual-timestamp)
     - name: Create Zip Archive
       run: |
-         pwd
          zip -q -m $PACKAGE_FILE_NAME ./*
-         ls *
       working-directory: 'irrelevant-apis/words-dotnet/web-build'
     - name: Create Release
       id: create_release
