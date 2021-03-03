@@ -5,7 +5,7 @@ GitHub examples
 [**words-dotnet-ci-cd.yml**](.github/workflows/words-dotnet-ci-cd.yml)
 
 Demonstrates a simple dotnet core CI/CD workflow, using dotnet CLI, GitHub Releases and App Service \
-![words-dotnet-ci-cd](https://github.com/martinabrle/github-samples/actions/workflows/words-dotnet-ci-cd.yml/badge.svg)\
+![words-dotnet-ci-cd](https://github.com/martinabrle/github-samples/actions/workflows/words-dotnet-ci-cd.yml/badge.svg) \
 
 [**push-pull-trigger-test.yml**](.github/workflows/push-pull-trigger-test.yml)
 
